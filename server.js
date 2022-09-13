@@ -9,6 +9,8 @@ const {shuffleArray} = require('./utils')
 require('dotenv').config()
 const{ROLLBARTOKEN} = process.env
 
+
+//rollbar events have comments before each for easier grading
 var Rollbar = require("rollbar");
 var rollbar = new Rollbar({
   accessToken: ROLLBARTOKEN,
@@ -16,6 +18,7 @@ var rollbar = new Rollbar({
   captureUnhandledRejections: true
 });
 
+rollbar.log("Rollbar up and running!")
 //my code
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "./public/index.html"))
@@ -37,8 +40,12 @@ app.use(express.json())
 app.get('/api/robots', (req, res) => {
     try {
         res.status(200).send(bots)
+        //rollbar event 1
+        rollbar.log("Successfully grabbed bots")
     } catch (error) {
         console.log('ERROR GETTING BOTS', error)
+        //rollbar event 2
+        rollbar.error("ERROR GETTING BOTS")
         res.sendStatus(400)
     }
 })
@@ -51,6 +58,8 @@ app.get('/api/robots/five', (req, res) => {
         res.status(200).send({choices, compDuo})
     } catch (error) {
         console.log('ERROR GETTING FIVE BOTS', error)
+        //rollbar event 3
+        rollbar.error("ERROR GETTING FIVE BOT")
         res.sendStatus(400)
     }
 })
@@ -75,9 +84,13 @@ app.post('/api/duel', (req, res) => {
         // comparing the total health to determine a winner
         if (compHealthAfterAttack > playerHealthAfterAttack) {
             playerRecord.losses++
+            //rollbar event 4
+            rollbar.log("You lost!")
             res.status(200).send('You lost!')
         } else {
             playerRecord.losses++
+            //rollbar event 5
+            rollbar.log("You won!")
             res.status(200).send('You won!')
         }
     } catch (error) {
